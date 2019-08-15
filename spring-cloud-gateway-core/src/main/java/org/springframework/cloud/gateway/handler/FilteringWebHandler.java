@@ -57,6 +57,7 @@ public class FilteringWebHandler implements WebHandler {
 
 	private static List<GatewayFilter> loadFilters(List<GlobalFilter> filters) {
 		return filters.stream().map(filter -> {
+			// 将 GlobalFilter 委托成 GatewayFilterAdapter
 			GatewayFilterAdapter gatewayFilter = new GatewayFilterAdapter(filter);
 			if (filter instanceof Ordered) {
 				int order = ((Ordered) filter).getOrder();
@@ -76,15 +77,18 @@ public class FilteringWebHandler implements WebHandler {
 		Route route = exchange.getRequiredAttribute(GATEWAY_ROUTE_ATTR);
 		List<GatewayFilter> gatewayFilters = route.getFilters();
 
+		// 添加route对应的GatewayFilters
 		List<GatewayFilter> combined = new ArrayList<>(this.globalFilters);
 		combined.addAll(gatewayFilters);
 		// TODO: needed or cached?
+		// 排序；过滤器数组首先会按照 order 升序排序，按照顺序过滤请求。
 		AnnotationAwareOrderComparator.sort(combined);
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("Sorted gatewayFilterFactories: " + combined);
 		}
 
+		// 动态构建filter链
 		return new DefaultGatewayFilterChain(combined).filter(exchange);
 	}
 
@@ -127,6 +131,10 @@ public class FilteringWebHandler implements WebHandler {
 
 	private static class GatewayFilterAdapter implements GatewayFilter {
 
+		/**
+		 * 委派模式（Delegate）
+		 * 将 GlobalFilter 委托成 GatewayFilterAdapter
+		 */
 		private final GlobalFilter delegate;
 
 		GatewayFilterAdapter(GlobalFilter delegate) {

@@ -89,6 +89,7 @@ public class RouteDefinitionRouteLocator
 			List<RoutePredicateFactory> predicates,
 			List<GatewayFilterFactory> gatewayFilterFactories,
 			GatewayProperties gatewayProperties, ConversionService conversionService) {
+		// 设置 RouteDefinitionLocator
 		this.routeDefinitionLocator = routeDefinitionLocator;
 		this.conversionService = conversionService;
 		initFactories(predicates);
@@ -139,10 +140,16 @@ public class RouteDefinitionRouteLocator
 		 */
 	}
 
+	/**
+	 * RouteDefinition => Route
+	 */
 	private Route convertToRoute(RouteDefinition routeDefinition) {
+		// 合并 Predicate
 		AsyncPredicate<ServerWebExchange> predicate = combinePredicates(routeDefinition);
+		// 获得 GatewayFilter
 		List<GatewayFilter> gatewayFilters = getFilters(routeDefinition);
 
+		// 构建 Route
 		return Route.async(routeDefinition).asyncPredicate(predicate)
 				.replaceFilters(gatewayFilters).build();
 	}
@@ -199,17 +206,20 @@ public class RouteDefinitionRouteLocator
 	private List<GatewayFilter> getFilters(RouteDefinition routeDefinition) {
 		List<GatewayFilter> filters = new ArrayList<>();
 
+		// 添加 默认过滤器
 		// TODO: support option to apply defaults after route specific filters?
 		if (!this.gatewayProperties.getDefaultFilters().isEmpty()) {
 			filters.addAll(loadGatewayFilters(DEFAULT_FILTERS,
 					this.gatewayProperties.getDefaultFilters()));
 		}
 
+		// 添加 配置的过滤器
 		if (!routeDefinition.getFilters().isEmpty()) {
 			filters.addAll(loadGatewayFilters(routeDefinition.getId(),
 					routeDefinition.getFilters()));
 		}
 
+		// 排序
 		AnnotationAwareOrderComparator.sort(filters);
 		return filters;
 	}

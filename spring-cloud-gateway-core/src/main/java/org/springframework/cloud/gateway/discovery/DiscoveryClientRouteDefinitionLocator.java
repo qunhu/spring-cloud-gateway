@@ -40,7 +40,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * TODO: change to RouteLocator? use java dsl
- *
+ * 从注册中心( 例如，Eureka / Consul / Zookeeper / Etcd 等 )读取。
  * @author Spencer Gibb
  */
 public class DiscoveryClientRouteDefinitionLocator implements RouteDefinitionLocator {

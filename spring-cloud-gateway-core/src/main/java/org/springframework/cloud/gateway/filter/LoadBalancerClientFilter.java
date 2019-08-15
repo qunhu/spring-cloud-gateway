@@ -76,6 +76,7 @@ public class LoadBalancerClientFilter implements GlobalFilter, Ordered {
 
 		log.trace("LoadBalancerClientFilter url before: " + url);
 
+		// 通过LoadBalancerClient负载均衡客户端，选取服务实例
 		final ServiceInstance instance = choose(exchange);
 
 		if (instance == null) {
@@ -96,6 +97,7 @@ public class LoadBalancerClientFilter implements GlobalFilter, Ordered {
 				new DelegatingServiceInstance(instance, overrideScheme), uri);
 
 		log.trace("LoadBalancerClientFilter url chosen: " + requestUrl);
+		// 最后构造好 requestUrl，设置到 GATEWAY_REQUEST_URL_ATTR 属性中
 		exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, requestUrl);
 		return chain.filter(exchange);
 	}

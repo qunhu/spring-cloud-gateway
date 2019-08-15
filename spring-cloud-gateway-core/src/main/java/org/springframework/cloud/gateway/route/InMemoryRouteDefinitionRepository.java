@@ -27,6 +27,7 @@ import org.springframework.cloud.gateway.support.NotFoundException;
 import static java.util.Collections.synchronizedMap;
 
 /**
+ * 从存储器( 例如，内存 / Redis / MySQL 等 )读取。
  * @author Spencer Gibb
  */
 public class InMemoryRouteDefinitionRepository implements RouteDefinitionRepository {

@@ -59,10 +59,12 @@ public class NettyWriteResponseFilter implements GlobalFilter, Ordered {
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+		log.trace("NettyWriteResponseFilter start ");
 		// NOTICE: nothing in "pre" filter stage as CLIENT_RESPONSE_CONN_ATTR is not added
 		// until the NettyRoutingFilter is run
 		// @formatter:off
 		return chain.filter(exchange)
+				.log()
 				.doOnError(throwable -> cleanup(exchange))
 				.then(Mono.defer(() -> {
 					Connection connection = exchange.getAttribute(CLIENT_RESPONSE_CONN_ATTR);
