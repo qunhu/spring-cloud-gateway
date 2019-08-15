@@ -41,6 +41,10 @@ public class CachingRouteLocator
 
 	public CachingRouteLocator(RouteLocator delegate) {
 		this.delegate = delegate;
+		// 提供一种Flux流缓存构造方式，意思是，当cache没有的时候，
+		// 我们执行this.delegate.getRoutes().sort(AnnotationAwareOrderComparator.INSTANCE)获得Flux流，
+		// 并把这个结果写入cache这个Map。这不会马上执行，当有subscribe才会执行。
+		// 是懒加载方式。
 		routes = CacheFlux.lookup(cache, "routes", Route.class)
 				.onCacheMissResume(() -> this.delegate.getRoutes()
 						.sort(AnnotationAwareOrderComparator.INSTANCE));

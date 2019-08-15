@@ -66,12 +66,23 @@ public class RouteDefinitionRouteLocator
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	/**
+	 * 目前是CompositeRouteDefinitionLocator
+	 */
 	private final RouteDefinitionLocator routeDefinitionLocator;
 
 	private final ConversionService conversionService;
 
+	/**
+	 * key 为 {@link RoutePredicateFactory#name()} 。
+	 * 通过它，将 RouteDefinition.predicates 转换成 Route.predicates 。
+	 */
 	private final Map<String, RoutePredicateFactory> predicates = new LinkedHashMap<>();
 
+	/**
+	 * key 为 {@link GatewayFilterFactory#name()} 。
+	 * 通过它，将 RouteDefinition.filters 转换成 Route.filters 。
+	 */
 	private final Map<String, GatewayFilterFactory> gatewayFilterFactories = new HashMap<>();
 
 	private final GatewayProperties gatewayProperties;
@@ -92,9 +103,12 @@ public class RouteDefinitionRouteLocator
 		// 设置 RouteDefinitionLocator
 		this.routeDefinitionLocator = routeDefinitionLocator;
 		this.conversionService = conversionService;
+		// 初始化 RoutePredicateFactory
 		initFactories(predicates);
+		// 初始化 RoutePredicateFactory
 		gatewayFilterFactories.forEach(
 				factory -> this.gatewayFilterFactories.put(factory.name(), factory));
+		// 设置 GatewayProperties
 		this.gatewayProperties = gatewayProperties;
 	}
 

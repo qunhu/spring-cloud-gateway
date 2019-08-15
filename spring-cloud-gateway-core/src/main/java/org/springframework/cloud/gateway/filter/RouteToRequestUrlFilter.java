@@ -65,9 +65,16 @@ public class RouteToRequestUrlFilter implements GlobalFilter, Ordered {
 		if (route == null) {
 			return chain.filter(exchange);
 		}
-		log.trace("RouteToRequestUrlFilter start");
+
 		URI uri = exchange.getRequest().getURI();
 		boolean encoded = containsEncodedParts(uri);
+
+		URI beforeUrl = UriComponentsBuilder.fromUri(uri)
+				// .uri(routeUri)
+				.scheme(uri.getScheme()).host(uri.getHost())
+				.port(uri.getPort()).build(encoded).toUri();
+		log.trace("RouteToRequestUrlFilter beforeUrl = " + beforeUrl);
+
 		URI routeUri = route.getUri();
 
 		if (hasAnotherScheme(routeUri)) {
@@ -90,6 +97,9 @@ public class RouteToRequestUrlFilter implements GlobalFilter, Ordered {
 				// .uri(routeUri)
 				.scheme(routeUri.getScheme()).host(routeUri.getHost())
 				.port(routeUri.getPort()).build(encoded).toUri();
+
+		log.trace("RouteToRequestUrlFilter mergedUrl = " + mergedUrl);
+
 		exchange.getAttributes().put(GATEWAY_REQUEST_URL_ATTR, mergedUrl);
 		return chain.filter(exchange);
 	}
